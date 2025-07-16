@@ -2,43 +2,36 @@
 const nextConfig = {
   // Performance optimizations
   swcMinify: true,
-  
+
   // Disable source maps in development for faster builds
   productionBrowserSourceMaps: false,
-  
+
   // Optimize webpack configuration
   webpack: (config, { dev, isServer }) => {
     // Optimize for development speed
     if (dev) {
       config.cache = {
-        type: 'filesystem',
+        type: "filesystem",
         buildDependencies: {
-          config: [__filename],
-        },
+          config: [__filename]
+        }
       };
-      
+
       // Reduce bundle size by excluding heavy modules in development
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@': require('path').resolve(__dirname, 'src'),
+        "@": require("path").resolve(__dirname, "src")
       };
-      
-      // Optimize chunking
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-            },
-          },
-        },
+
+      // Fix module system conflicts
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false
       };
     }
-    
+
     return config;
   },
 
@@ -49,7 +42,7 @@ const nextConfig = {
   // Simplified experimental features
   experimental: {
     optimizeCss: false, // Disable for faster dev builds
-    turbo: false, // Disable turbo temporarily to fix issues
+    turbo: false // Disable turbo temporarily to fix issues
   },
 
   // Enable gzip compression
