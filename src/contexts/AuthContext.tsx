@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo, useCallback } from 'react';
 import authService, { User, LoginCredentials, RegisterData } from '@/services/auth';
 
 interface AuthContextType {
@@ -23,7 +23,58 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const isAuthenticated = !!user;
+  // Memoize computed values
+  const isAuthenticated = useMemo(() => !!user, [user]);
+
+  // Memoize functions to prevent unnecessary re-renders
+  const login = useCallback(async (credentials: LoginCredentials) => {
+    setIsLoading(true);
+    try {
+      const authData = await authService.login(credentials);
+      setUser(authData.user);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const register = useCallback(async (userData: RegisterData) => {
+    setIsLoading(true);
+    try {
+      const authData = await authService.register(userData);
+      setUser(authData.user);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await authService.logout();
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    if (!authService.isAuthenticated()) return;
+    
+    try {
+      const userData = await authService.getCurrentUser();
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+      // If refresh fails, logout user
+      await logout();
+    }
+  }, [logout]);
 
   // Check if user is already logged in on app start
   useEffect(() => {
@@ -45,55 +96,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (credentials: LoginCredentials) => {
-    setIsLoading(true);
-    try {
-      const authData = await authService.login(credentials);
-      setUser(authData.user);
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const register = async (userData: RegisterData) => {
-    setIsLoading(true);
-    try {
-      const authData = await authService.register(userData);
-      setUser(authData.user);
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const logout = async () => {
-    setIsLoading(true);
-    try {
-      await authService.logout();
-      setUser(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const refreshUser = async () => {
-    try {
-      if (authService.isAuthenticated()) {
-        const userData = await authService.getCurrentUser();
-        setUser(userData);
-      }
-    } catch (error) {
-      console.error('Failed to refresh user:', error);
-      setUser(null);
-    }
-  };
-
-  const value: AuthContextType = {
+  // Memoize the context value to prevent unnecessary re-renders
+  const value: AuthContextType = useMemo(() => ({
     user,
     isAuthenticated,
     isLoading,
@@ -101,7 +105,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     refreshUser
-  };
+  }), [user, isAuthenticated, isLoading, login, register, logout, refreshUser]);
 
   return (
     <AuthContext.Provider value={value}>

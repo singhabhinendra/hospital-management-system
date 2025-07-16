@@ -5,12 +5,18 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "next dev",
+    "dev:fast": "next dev --turbo",
     "dev:backend": "cd backend && nodemon server.js",
+    "dev:frontend-only": "next dev",
     "seed": "cd backend && node seed.js",
     "build": "next build",
+    "build:analyze": "ANALYZE=true npm run build",
     "start": "next start",
     "lint": "next lint",
-    "server": "cd backend && node server.js"
+    "lint:fix": "next lint --fix",
+    "server": "cd backend && node server.js",
+    "clean": "if (Test-Path .next) { Remove-Item -Recurse -Force .next }",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

@@ -1,37 +1,37 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import LandingPage from './landing/page'
+import LoadingSpinner from '@/components/LoadingSpinner'
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
+  const [showLanding, setShowLanding] = useState(false)
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.push('/dashboard')
+    if (!isLoading) {
+      if (isAuthenticated) {
+        router.push('/dashboard')
+      } else {
+        setShowLanding(true)
+      }
     }
   }, [isAuthenticated, isLoading, router])
 
   // Show loading spinner while checking authentication
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading MediCare HMS...</p>
-        </div>
-      </div>
-    )
+    return <LoadingSpinner />
   }
 
   // Show landing page for non-authenticated users
-  if (!isAuthenticated) {
+  if (!isAuthenticated && showLanding) {
+    // Import landing page dynamically to reduce initial bundle
+    const LandingPage = require('./landing/page').default
     return <LandingPage />
   }
 
-  // This should not happen, but just in case
-  return null
+  // Default loading state
+  return <LoadingSpinner />
 }
