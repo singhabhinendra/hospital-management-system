@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import AuthenticatedLayout from '@/components/AuthenticatedLayout'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function SettingsPage() {
@@ -61,17 +62,18 @@ export default function SettingsPage() {
   const inputClassName = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white placeholder-gray-500"
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <div className="flex space-x-3">
-          <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
-            🔄 Reset to Defaults
-          </button>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
-            💾 Save All Changes
-          </button>
-        </div>
+    <AuthenticatedLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+          <div className="flex space-x-3">
+            <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+              🔄 Reset to Defaults
+            </button>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+              💾 Save All Changes
+            </button>
+          </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -424,5 +426,6 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+    </AuthenticatedLayout>
   )
 }

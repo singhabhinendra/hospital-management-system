@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import AuthenticatedLayout from '@/components/AuthenticatedLayout'
 
 interface BillingRecord {
   _id: string
@@ -296,17 +297,18 @@ export default function BillingPage() {
   const inputClassName = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white placeholder-gray-500"
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Billing Management</h1>
-        <div className="flex space-x-3">
-          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
-            📊 Financial Report
-          </button>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
-          >
+    <AuthenticatedLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Billing Management</h1>
+          <div className="flex space-x-3">
+            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+              📊 Financial Report
+            </button>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+            >
             💰 Create Invoice
           </button>
         </div>
@@ -731,5 +733,6 @@ export default function BillingPage() {
         </div>
       )}
     </div>
+    </AuthenticatedLayout>
   )
 }

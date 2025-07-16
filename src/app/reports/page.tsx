@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import AuthenticatedLayout from '@/components/AuthenticatedLayout'
 
 export default function ReportsPage() {
   const [reportType, setReportType] = useState('patients')
@@ -508,15 +509,16 @@ export default function ReportsPage() {
   const inputClassName = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white placeholder-gray-500"
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
-        <div className="flex space-x-3">
-          <button 
-            onClick={() => setShowScheduleModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center space-x-2"
-          >
-            <span>📧</span>
+    <AuthenticatedLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
+          <div className="flex space-x-3">
+            <button 
+              onClick={() => setShowScheduleModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center space-x-2"
+            >
+              <span>📧</span>
             <span>Schedule Report</span>
           </button>
         </div>
@@ -777,49 +779,57 @@ export default function ReportsPage() {
               </div>
 
               <div className="grid gap-4">
-                {recentReports.map((report) => (
-                  <div key={report.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{report.name}</h3>
-                        <p className="text-sm text-gray-600">{report.type}</p>
-                        <div className="flex items-center space-x-4 mt-2">
-                          <span className="text-xs text-gray-500">📅 {report.date}</span>
-                          <span className="text-xs text-gray-500">📁 {report.size}</span>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            report.status === 'Completed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {report.status}
-                          </span>
+                {filteredReports.length > 0 ? (
+                  filteredReports.map((report) => (
+                    <div key={report.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900">{report.name}</h3>
+                          <p className="text-sm text-gray-600">{report.type}</p>
+                          <div className="flex items-center space-x-4 mt-2">
+                            <span className="text-xs text-gray-500">📅 {report.date}</span>
+                            <span className="text-xs text-gray-500">📁 {report.size}</span>
+                            <span className={`px-2 py-1 text-xs rounded-full ${
+                              report.status === 'Completed' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {report.status}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          {report.downloadUrl && (
+                            <button 
+                              onClick={() => downloadReport(report)}
+                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                              📥 Download
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => viewReport(report)}
+                            className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+                          >
+                            👁️ View
+                          </button>
+                          <button 
+                            onClick={() => deleteReport(report)}
+                            className="text-red-600 hover:text-red-800 text-sm font-medium"
+                          >
+                            🗑️ Delete
+                          </button>
                         </div>
                       </div>
-                      <div className="flex space-x-2">
-                        {report.downloadUrl && (
-                          <button 
-                            onClick={() => downloadReport(report)}
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                          >
-                            📥 Download
-                          </button>
-                        )}
-                        <button 
-                          onClick={() => viewReport(report)}
-                          className="text-gray-600 hover:text-gray-800 text-sm font-medium"
-                        >
-                          👁️ View
-                        </button>
-                        <button 
-                          onClick={() => deleteReport(report)}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium"
-                        >
-                          🗑️ Delete
-                        </button>
-                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="text-4xl mb-2">📊</div>
+                    <p className="text-gray-600">No reports found matching your criteria</p>
+                    <p className="text-sm text-gray-500">Try adjusting your search or filter options</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -943,5 +953,6 @@ export default function ReportsPage() {
         </div>
       )}
     </div>
+    </AuthenticatedLayout>
   )
 }

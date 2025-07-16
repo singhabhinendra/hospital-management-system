@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import AuthenticatedLayout from '@/components/AuthenticatedLayout'
 
 interface InventoryItem {
   _id: string
@@ -255,18 +256,19 @@ export default function InventoryPage() {
   const inputClassName = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white placeholder-gray-500"
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
-        <div className="flex space-x-3">
-          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
-            📊 Generate Report
-          </button>
-          <button
-            onClick={() => {setShowAddForm(true); setEditingItem(null)}}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
-          >
-            📦 Add New Item
+    <AuthenticatedLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
+          <div className="flex space-x-3">
+            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+              📊 Generate Report
+            </button>
+            <button
+              onClick={() => {setShowAddForm(true); setEditingItem(null)}}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+            >
+              📦 Add New Item
           </button>
         </div>
       </div>
@@ -623,5 +625,6 @@ export default function InventoryPage() {
         </div>
       )}
     </div>
+    </AuthenticatedLayout>
   )
 }

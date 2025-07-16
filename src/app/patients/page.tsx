@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Patient } from '@/services/patients'
 import patientService from '@/services/patients'
+import AuthenticatedLayout from '@/components/AuthenticatedLayout'
 
 interface PatientFormData {
   firstName: string;
@@ -189,24 +190,27 @@ export default function PatientsPage() {
 
   if (loading && patients.length === 0) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading patients...</div>
-      </div>
+      <AuthenticatedLayout>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading patients...</div>
+        </div>
+      </AuthenticatedLayout>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Patient Management</h1>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
-        >
-          <span className="text-lg">+</span>
-          Add Patient
-        </button>
-      </div>
+    <AuthenticatedLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Patient Management</h1>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+          >
+            <span className="text-lg">+</span>
+            Add Patient
+          </button>
+        </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
@@ -608,5 +612,6 @@ export default function PatientsPage() {
         </div>
       )}
     </div>
+    </AuthenticatedLayout>
   )
 }

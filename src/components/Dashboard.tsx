@@ -98,7 +98,7 @@ export default function Dashboard({ onNavigateToSection }: DashboardProps) {
                   <p className="text-sm text-gray-500">{appointment.type}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-primary-600">{appointment.time}</p>
+                  <p className="font-medium text-blue-600">{appointment.time}</p>
                 </div>
               </div>
             ))}
@@ -112,31 +112,31 @@ export default function Dashboard({ onNavigateToSection }: DashboardProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button 
             onClick={() => onNavigateToSection?.('patients')}
-            className="bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-lg text-center transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-center transition-colors"
           >
-            <div className="text-2xl mb-2">➕</div>
-            <div className="font-medium">Add Patient</div>
+            <div className="text-2xl mb-2">👥</div>
+            <div className="font-medium text-white">Add Patient</div>
           </button>
           <button 
             onClick={() => onNavigateToSection?.('appointments')}
-            className="bg-medical-600 hover:bg-medical-700 text-white p-4 rounded-lg text-center transition-colors"
+            className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition-colors"
           >
             <div className="text-2xl mb-2">📅</div>
-            <div className="font-medium">Schedule Appointment</div>
+            <div className="font-medium text-white">Schedule Appointment</div>
           </button>
           <button 
             onClick={() => onNavigateToSection?.('reports')}
             className="bg-yellow-600 hover:bg-yellow-700 text-white p-4 rounded-lg text-center transition-colors"
           >
             <div className="text-2xl mb-2">📋</div>
-            <div className="font-medium">View Reports</div>
+            <div className="font-medium text-white">View Reports</div>
           </button>
           <button 
             onClick={() => onNavigateToSection?.('settings')}
             className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-center transition-colors"
           >
             <div className="text-2xl mb-2">⚙️</div>
-            <div className="font-medium">Settings</div>
+            <div className="font-medium text-white">Settings</div>
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import AuthenticatedLayout from '@/components/AuthenticatedLayout'
 
 interface Appointment {
   _id: string
@@ -175,16 +176,17 @@ export default function AppointmentsPage() {
   const inputClassName = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white placeholder-gray-500"
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Appointments Management</h1>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
-        >
-          📅 Schedule New Appointment
-        </button>
-      </div>
+    <AuthenticatedLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Appointments Management</h1>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+          >
+            📅 Schedule New Appointment
+          </button>
+        </div>
 
       {/* Search and Filter */}
       <div className="bg-white p-6 rounded-lg shadow-md">
@@ -416,5 +418,6 @@ export default function AppointmentsPage() {
         </div>
       )}
     </div>
+    </AuthenticatedLayout>
   )
 }
