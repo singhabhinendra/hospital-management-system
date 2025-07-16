@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Global input visibility fix */
+@layer base {
+  input, 
+  textarea, 
+  select {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+    opacity: 1 !important;
+  }
+  
+  input::placeholder,
+  textarea::placeholder {
+    color: #6b7280 !important;
+    opacity: 0.7 !important;
+  }
+  
+  input:focus,
+  textarea:focus,
+  select:focus {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* Ensure caret is visible */
+  input, textarea {
+    caret-color: #111827 !important;
+  }
+
+  /* Ensure selection is visible */
+  input::selection,
+  textarea::selection {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+  }
+}
