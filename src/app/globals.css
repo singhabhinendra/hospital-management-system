@@ -16,15 +16,6 @@
   }
 }
 
-/* Optimize global styles */
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
@@ -33,63 +24,10 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-  font-feature-settings: 'rlig' 1, 'calt' 1;
-}
-
-/* Performance optimization for animations */
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-.animate-ping {
-  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-/* Optimize transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
-  }
-}
-
-/* Global input visibility fix */
-@layer base {
-  input, 
-  textarea, 
-  select {
-    color: #111827 !important;
-    background-color: #ffffff !important;
-    opacity: 1 !important;
-  }
-  
-  input::placeholder,
-  textarea::placeholder {
-    color: #6b7280 !important;
-    opacity: 0.7 !important;
-  }
-  
-  input:focus,
-  textarea:focus,
-  select:focus {
-    color: #111827 !important;
-    background-color: #ffffff !important;
-  }
-
-  /* Ensure caret is visible */
-  input, textarea {
-    caret-color: #111827 !important;
-  }
-
-  /* Ensure selection is visible */
-  input::selection,
-  textarea::selection {
-    background-color: #3b82f6 !important;
-    color: #ffffff !important;
   }
 }
