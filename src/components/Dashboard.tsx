@@ -1,6 +1,18 @@
 'use client'
 
-export default function Dashboard() {
+import { useState, useEffect } from 'react'
+
+interface DashboardProps {
+  onNavigateToSection?: (section: string) => void
+}
+
+export default function Dashboard({ onNavigateToSection }: DashboardProps) {
+  const [currentTime, setCurrentTime] = useState<string>('')
+
+  useEffect(() => {
+    // Set the time only on the client side to avoid hydration mismatch
+    setCurrentTime(new Date().toLocaleString())
+  }, [])
   const stats = [
     { title: 'Total Patients', value: '1,234', change: '+12%', icon: '👥' },
     { title: 'Doctors Available', value: '89', change: '+3%', icon: '👨‍⚕️' },
@@ -25,7 +37,7 @@ export default function Dashboard() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <div className="text-sm text-gray-500">
-          Last updated: {new Date().toLocaleString()}
+          {currentTime && `Last updated: ${currentTime}`}
         </div>
       </div>
 
@@ -76,7 +88,7 @@ export default function Dashboard() {
 
         {/* Upcoming Appointments */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Today's Appointments</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Today&apos;s Appointments</h2>
           <div className="space-y-4">
             {upcomingAppointments.map((appointment) => (
               <div key={appointment.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
@@ -86,7 +98,7 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-500">{appointment.type}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-primary-600">{appointment.time}</p>
+                  <p className="font-medium text-blue-600">{appointment.time}</p>
                 </div>
               </div>
             ))}
@@ -98,21 +110,33 @@ export default function Dashboard() {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-lg text-center transition-colors">
-            <div className="text-2xl mb-2">➕</div>
-            <div className="font-medium">Add Patient</div>
+          <button 
+            onClick={() => onNavigateToSection?.('patients')}
+            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-center transition-colors"
+          >
+            <div className="text-2xl mb-2">👥</div>
+            <div className="font-medium text-white">Add Patient</div>
           </button>
-          <button className="bg-medical-600 hover:bg-medical-700 text-white p-4 rounded-lg text-center transition-colors">
+          <button 
+            onClick={() => onNavigateToSection?.('appointments')}
+            className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition-colors"
+          >
             <div className="text-2xl mb-2">📅</div>
-            <div className="font-medium">Schedule Appointment</div>
+            <div className="font-medium text-white">Schedule Appointment</div>
           </button>
-          <button className="bg-yellow-600 hover:bg-yellow-700 text-white p-4 rounded-lg text-center transition-colors">
+          <button 
+            onClick={() => onNavigateToSection?.('reports')}
+            className="bg-yellow-600 hover:bg-yellow-700 text-white p-4 rounded-lg text-center transition-colors"
+          >
             <div className="text-2xl mb-2">📋</div>
-            <div className="font-medium">View Reports</div>
+            <div className="font-medium text-white">View Reports</div>
           </button>
-          <button className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-center transition-colors">
+          <button 
+            onClick={() => onNavigateToSection?.('settings')}
+            className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-center transition-colors"
+          >
             <div className="text-2xl mb-2">⚙️</div>
-            <div className="font-medium">Settings</div>
+            <div className="font-medium text-white">Settings</div>
           </button>
         </div>
       </div>
