@@ -1,37 +1,27 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
-import LoadingSpinner from '@/components/LoadingSpinner'
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
-  const { isAuthenticated, isLoading } = useAuth()
-  const router = useRouter()
-  const [showLanding, setShowLanding] = useState(false)
+export default function HomePage() {
+  const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        router.push('/dashboard')
-      } else {
-        setShowLanding(true)
-      }
+    // Check if user is already logged in
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    
+    if (isLoggedIn === 'true') {
+      // If logged in, redirect to dashboard
+      router.push('/dashboard');
+    } else {
+      // If not logged in, redirect to landing page
+      router.push('/landing');
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [router]);
 
-  // Show loading spinner while checking authentication
-  if (isLoading) {
-    return <LoadingSpinner />
-  }
-
-  // Show landing page for non-authenticated users
-  if (!isAuthenticated && showLanding) {
-    // Import landing page dynamically to reduce initial bundle
-    const LandingPage = require('./landing/page').default
-    return <LandingPage />
-  }
-
-  // Default loading state
-  return <LoadingSpinner />
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+    </div>
+  );
 }
