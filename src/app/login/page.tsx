@@ -14,7 +14,7 @@ export default function LoginPage() {
     remember: false
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
   // Redirect if already authenticated
@@ -31,16 +31,18 @@ export default function LoginPage() {
       [name]: type === 'checkbox' ? checked : value
     }));
     
+    // Clear specific field error when user starts typing
     if (errors[name]) {
-      setErrors((prev: any) => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
     }
   };
 
   const validateForm = () => {
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -50,6 +52,8 @@ export default function LoginPage() {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
+    } else if (formData.password.length < 3) {
+      newErrors.password = 'Password must be at least 3 characters';
     }
 
     setErrors(newErrors);
@@ -67,11 +71,10 @@ export default function LoginPage() {
     setErrors({});
     
     try {
-      // Demo authentication - no API calls needed
-      console.log('Login attempt:', formData);
+      console.log('Login attempt:', { email: formData.email, remember: formData.remember });
       
-      // Simulate loading time
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Simulate loading time for better UX
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Demo credentials check
       const demoCredentials = [
@@ -99,14 +102,22 @@ export default function LoginPage() {
         throw new Error('Please enter valid credentials');
       }
 
-      // Store user session in localStorage (keeping your existing approach)
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userRole', userData.role);
-      localStorage.setItem('userEmail', userData.email);
-      localStorage.setItem('userName', userData.name);
+      // Store user session data
+      const sessionData = {
+        isLoggedIn: 'true',
+        userRole: userData.role,
+        userEmail: userData.email,
+        userName: userData.name,
+        auth_token: 'demo_token_' + Date.now(),
+        loginTime: new Date().toISOString()
+      };
+
+      // Store in localStorage
+      Object.entries(sessionData).forEach(([key, value]) => {
+        localStorage.setItem(key, value);
+      });
       
-      // Also store for AuthContext compatibility
-      localStorage.setItem('auth_token', 'demo_token_' + Date.now());
+      // Store user data for AuthContext compatibility
       localStorage.setItem('user_data', JSON.stringify({
         id: userData.email,
         email: userData.email,
@@ -114,18 +125,20 @@ export default function LoginPage() {
         role: userData.role
       }));
 
-      console.log('Login successful, redirecting to dashboard...');
+      console.log('Login successful, stored session data:', sessionData);
       
-      // Try to use AuthContext login first
+      // Try to use AuthContext login first, then fallback to direct navigation
       try {
+        console.log('Attempting AuthContext login...');
         await login({
           email: formData.email,
           password: formData.password
         });
+        console.log('AuthContext login successful, navigating...');
         router.push('/dashboard');
       } catch (authError) {
-        console.log('AuthContext login failed, using direct redirect');
-        // Fallback to direct redirect if AuthContext fails
+        console.log('AuthContext login failed, using direct redirect:', authError);
+        // Force page reload to ensure auth state is updated
         window.location.href = '/dashboard';
       }
       
@@ -172,10 +185,13 @@ export default function LoginPage() {
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
+          Hospital Management System
         </h2>
+        <p className="mt-2 text-center text-lg font-semibold text-gray-700">
+          Sign in to your account
+        </p>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
             Create one here
           </Link>
@@ -185,12 +201,19 @@ export default function LoginPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {errors.general && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {errors.general}
+            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+              <span className="block sm:inline">{errors.general}</span>
+              <button 
+                onClick={() => setErrors(prev => ({ ...prev, general: '' }))}
+                className="absolute top-0 bottom-0 right-0 px-4 py-3"
+              >
+                <span className="sr-only">Dismiss</span>
+                ×
+              </button>
             </div>
           )}
           
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit} noValidate>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
@@ -200,9 +223,12 @@ export default function LoginPage() {
                   id="email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className={`appearance-none block w-full px-3 py-2 border ${
+                    errors.email ? 'border-red-300' : 'border-gray-300'
+                  } rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                   placeholder="Enter your email"
                 />
                 {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
@@ -218,9 +244,12 @@ export default function LoginPage() {
                   id="password"
                   name="password"
                   type="password"
+                  autoComplete="current-password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className={`appearance-none block w-full px-3 py-2 border ${
+                    errors.password ? 'border-red-300' : 'border-gray-300'
+                  } rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                   placeholder="Enter your password"
                 />
                 {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
@@ -243,9 +272,13 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                <button 
+                  type="button"
+                  onClick={() => alert('Password reset functionality would be implemented here')}
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
                   Forgot your password?
-                </a>
+                </button>
               </div>
             </div>
 
@@ -253,7 +286,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 {loading ? (
                   <>
@@ -280,11 +313,16 @@ export default function LoginPage() {
               </div>
             </div>
             <div className="mt-4 space-y-2 text-sm text-gray-600">
-              <div className="bg-gray-50 p-3 rounded">
-                <p><strong>Admin:</strong> admin@hospital.com / admin123</p>
-                <p><strong>Doctor:</strong> doctor@hospital.com / doctor123</p>
-                <p><strong>Quick Demo:</strong> demo@demo.com / demo</p>
-                <p className="text-xs text-gray-500 mt-2">Or use any email/password combination</p>
+              <div className="bg-gray-50 p-3 rounded border">
+                <div className="space-y-1">
+                  <p><strong>Admin:</strong> admin@hospital.com / admin123</p>
+                  <p><strong>Doctor:</strong> doctor@hospital.com / doctor123</p>
+                  <p><strong>Nurse:</strong> nurse@hospital.com / nurse123</p>
+                  <p><strong>Quick Demo:</strong> demo@demo.com / demo</p>
+                </div>
+                <p className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-200">
+                  💡 Or use any email/password combination for instant access
+                </p>
               </div>
             </div>
           </div>
