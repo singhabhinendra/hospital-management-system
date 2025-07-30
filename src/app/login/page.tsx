@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,6 +16,13 @@ export default function LoginPage() {
 
   const [errors, setErrors] = useState<any>({});
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -55,52 +64,102 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+    setErrors({});
     
     try {
       // Demo authentication - no API calls needed
       console.log('Login attempt:', formData);
       
       // Simulate loading time
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       // Demo credentials check
       const demoCredentials = [
-        { email: 'admin@hospital.com', password: 'admin123', role: 'admin' },
-        { email: 'doctor@hospital.com', password: 'doctor123', role: 'doctor' },
-        { email: 'nurse@hospital.com', password: 'nurse123', role: 'nurse' },
-        { email: 'demo@demo.com', password: 'demo', role: 'admin' }
+        { email: 'admin@hospital.com', password: 'admin123', role: 'admin', name: 'Admin User' },
+        { email: 'doctor@hospital.com', password: 'doctor123', role: 'doctor', name: 'Dr. Smith' },
+        { email: 'nurse@hospital.com', password: 'nurse123', role: 'nurse', name: 'Nurse Johnson' },
+        { email: 'demo@demo.com', password: 'demo', role: 'admin', name: 'Demo User' }
       ];
 
       const user = demoCredentials.find(
-        cred => cred.email === formData.email && cred.password === formData.password
+        cred => cred.email.toLowerCase() === formData.email.toLowerCase() && cred.password === formData.password
       );
 
-      if (user || (formData.email && formData.password)) {
-        // Store user session in localStorage
-        const userData = user || { 
+      let userData;
+      if (user) {
+        userData = user;
+      } else if (formData.email && formData.password) {
+        // Allow any email/password combination for demo
+        userData = { 
           email: formData.email, 
           role: 'demo',
-          name: formData.email.split('@')[0]
+          name: formData.email.split('@')[0] || 'Demo User'
         };
-        
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userRole', userData.role);
-        localStorage.setItem('userEmail', userData.email);
-        localStorage.setItem('userName', userData.name || userData.email.split('@')[0]);
-        
-        // Redirect to dashboard
-        router.push('/dashboard');
       } else {
-        setErrors({ general: 'Invalid credentials. Try: admin@hospital.com / admin123' });
+        throw new Error('Please enter valid credentials');
+      }
+
+      // Store user session in localStorage (keeping your existing approach)
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userRole', userData.role);
+      localStorage.setItem('userEmail', userData.email);
+      localStorage.setItem('userName', userData.name);
+      
+      // Also store for AuthContext compatibility
+      localStorage.setItem('auth_token', 'demo_token_' + Date.now());
+      localStorage.setItem('user_data', JSON.stringify({
+        id: userData.email,
+        email: userData.email,
+        fullName: userData.name,
+        role: userData.role
+      }));
+
+      console.log('Login successful, redirecting to dashboard...');
+      
+      // Try to use AuthContext login first
+      try {
+        await login({
+          email: formData.email,
+          password: formData.password
+        });
+        router.push('/dashboard');
+      } catch (authError) {
+        console.log('AuthContext login failed, using direct redirect');
+        // Fallback to direct redirect if AuthContext fails
+        window.location.href = '/dashboard';
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      setErrors({ general: 'Login failed. Please try again.' });
+      setErrors({ general: error.message || 'Login failed. Please try again.' });
     } finally {
       setLoading(false);
     }
   };
+
+  // Show loading spinner if auth context is still checking
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't show login form if already authenticated
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -225,6 +284,7 @@ export default function LoginPage() {
                 <p><strong>Admin:</strong> admin@hospital.com / admin123</p>
                 <p><strong>Doctor:</strong> doctor@hospital.com / doctor123</p>
                 <p><strong>Quick Demo:</strong> demo@demo.com / demo</p>
+                <p className="text-xs text-gray-500 mt-2">Or use any email/password combination</p>
               </div>
             </div>
           </div>
