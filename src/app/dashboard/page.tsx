@@ -181,7 +181,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="ml-5 w-0 flex-1">
                         <dl>
-                          <dt className="text-sm font-medium text-gray-500 truncate">Today's Appointments</dt>
+                          <dt className="text-sm font-medium text-gray-500 truncate">Today &apos Appointments</dt>
                           <dd className="text-2xl font-bold text-gray-900">89</dd>
                         </dl>
                       </div>
